@@ -42,33 +42,46 @@ export default function SearchBar({ onResult }: SearchBarProps) {
     );
   };
 
+  const trimmed = query.trim();
+
   return (
     <div className="relative">
       <form
         onSubmit={handleSearch}
-        className="sticker flex items-stretch overflow-hidden bg-white"
+        className="glass-card flex items-center gap-2 px-3 py-2"
       >
+        <span
+          aria-hidden
+          className="shrink-0 select-none text-base leading-none text-white/55"
+        >
+          {searching ? (
+            <span className="inline-block animate-spin">⟳</span>
+          ) : (
+            '🔍'
+          )}
+        </span>
         <input
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
             setErr(null);
           }}
-          placeholder="어디 박제할까? 🔍 (예: 홍대, 남산)"
-          className="flex-1 bg-transparent px-4 py-3 text-sm font-semibold text-black placeholder:text-black/40 outline-none"
+          placeholder="장소를 검색하세요 (예: 홍대, 남산)"
+          className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-white/40 outline-none"
         />
-        <button
-          type="submit"
-          disabled={searching || !query.trim()}
-          className="bg-cyber-pink px-4 py-3 text-sm font-extrabold text-white disabled:opacity-50"
-          style={{ borderLeft: '3px solid #000' }}
-        >
-          {searching ? '...' : 'GO'}
-        </button>
+        {trimmed && (
+          <button
+            type="submit"
+            disabled={searching}
+            className="shrink-0 rounded-full bg-lock-violet px-3 py-1 text-xs font-extrabold text-white shadow-glow-violet transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+          >
+            {searching ? '...' : '검색'}
+          </button>
+        )}
       </form>
       {err && (
-        <div className="absolute left-0 right-0 top-full mt-1 z-10">
-          <div className="chip bg-neon-yellow inline-block">{err}</div>
+        <div className="absolute left-0 right-0 top-full z-10 mt-1.5 px-1">
+          <div className="glass-chip inline-flex text-white">⚠️ {err}</div>
         </div>
       )}
     </div>

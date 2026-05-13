@@ -8,3 +8,7 @@ out
 *.log
 .vercel
 next-env.d.ts
+
+# Claude Code personal config
+.claude/settings.local.json
+.claude/hooks/
