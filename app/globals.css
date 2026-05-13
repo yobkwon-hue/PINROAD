@@ -1,0 +1,168 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css');
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+  background: #0b0b14;
+  color: #fff;
+  font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: #0b0b14;
+  background-image:
+    radial-gradient(circle at 15% 18%, rgba(255, 46, 147, 0.22), transparent 42%),
+    radial-gradient(circle at 88% 78%, rgba(0, 217, 255, 0.2), transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(176, 38, 255, 0.12), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    100% 100%,
+    36px 36px,
+    36px 36px;
+  background-attachment: fixed;
+}
+
+/* ---------- Utility classes (custom) ---------- */
+
+.font-display {
+  font-family: 'Black Han Sans', 'Pretendard Variable', sans-serif;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+.bg-holo {
+  background-image: linear-gradient(
+    115deg,
+    #ff2e93 0%,
+    #b026ff 28%,
+    #00d9ff 58%,
+    #c7ff00 88%,
+    #ff2e93 100%
+  );
+  background-size: 220% 220%;
+}
+
+.bg-chrome {
+  background-image: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #e8e8f4 28%,
+    #b8b8cc 52%,
+    #ffffff 68%,
+    #b8b8cc 100%
+  );
+}
+
+.text-holo {
+  background-image: linear-gradient(115deg, #ff2e93, #b026ff, #00d9ff, #c7ff00);
+  background-size: 220% 220%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: holoShift 5s ease infinite;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 2.5px #000;
+  paint-order: stroke fill;
+}
+
+.sticker {
+  border: 3px solid #000;
+  border-radius: 16px;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.sticker-lg {
+  border: 3px solid #000;
+  border-radius: 22px;
+  box-shadow: 6px 6px 0 #000;
+}
+
+.sticker-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 18px;
+  font-weight: 800;
+  border: 3px solid #000;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 #000;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.sticker-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #000;
+}
+.sticker-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 #000;
+}
+.sticker-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 4px 4px 0 #000;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: 2px solid #000;
+  border-radius: 999px;
+  color: #000;
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0b14;
+}
+::-webkit-scrollbar-thumb {
+  background: #ff2e93;
+  border-radius: 6px;
+  border: 2px solid #0b0b14;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff60a8;
+}
+
+/* Kakao map info window default styling reset */
+.map-shell {
+  position: absolute;
+  inset: 0;
+}
