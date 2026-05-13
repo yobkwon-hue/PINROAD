@@ -1,0 +1,11 @@
+{
+  "git.autofetch": true,
+  "git.autofetchPeriod": 180,
+  "git.confirmSync": false,
+  "git.showInlineOpenFileAction": true,
+  "git.suggestSmartCommit": false,
+  "scm.alwaysShowProviders": true,
+  "scm.diffDecorationsGutterAction": "diff",
+  "scm.alwaysShowActions": true,
+  "scm.countBadge": "all"
+}
