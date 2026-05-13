@@ -17,6 +17,15 @@ const config: Config = {
         'neon-lime': '#C7FF00',
         chrome: '#E8E8F4',
         'chrome-mid': '#B8B8CC',
+        // Cosmic glass palette
+        'space-deep': '#0A0E1F',
+        'space-mid': '#15192E',
+        'space-light': '#1F2547',
+        'lock-violet': '#7C5FFF',
+        'lock-violet-light': '#A78BFF',
+        'lock-violet-dim': '#5B3FE0',
+        'lock-glow': '#B26BFF',
+        'lock-cyan': '#5BC8FF',
       },
       fontFamily: {
         sans: ['"Pretendard Variable"', 'Pretendard', 'system-ui', 'sans-serif'],
@@ -30,6 +39,9 @@ const config: Config = {
         'sticker-white': '4px 4px 0 #fff',
         'glow-pink': '0 0 28px rgba(255, 46, 147, 0.55)',
         'glow-blue': '0 0 28px rgba(0, 217, 255, 0.55)',
+        'glow-violet': '0 0 28px rgba(124, 95, 255, 0.55)',
+        'glow-violet-strong': '0 0 40px rgba(178, 107, 255, 0.7)',
+        glass: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
       },
       animation: {
         wiggle: 'wiggle 1.6s ease-in-out infinite',
