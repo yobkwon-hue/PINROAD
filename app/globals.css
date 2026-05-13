@@ -16,7 +16,7 @@
 html,
 body {
   height: 100%;
-  background: #0b0b14;
+  background: #0a0e1f;
   color: #fff;
   font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -24,19 +24,19 @@ body {
 }
 
 body {
-  background-color: #0b0b14;
+  background-color: #0a0e1f;
   background-image:
-    radial-gradient(circle at 15% 18%, rgba(255, 46, 147, 0.22), transparent 42%),
-    radial-gradient(circle at 88% 78%, rgba(0, 217, 255, 0.2), transparent 45%),
-    radial-gradient(circle at 50% 50%, rgba(176, 38, 255, 0.12), transparent 60%),
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    radial-gradient(circle at 18% 28%, rgba(124, 95, 255, 0.28), transparent 48%),
+    radial-gradient(circle at 82% 72%, rgba(178, 107, 255, 0.22), transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(91, 200, 255, 0.08), transparent 60%),
+    radial-gradient(1px 1px at 24px 32px, rgba(255, 255, 255, 0.18), transparent 50%),
+    radial-gradient(1px 1px at 80px 120px, rgba(255, 255, 255, 0.12), transparent 50%);
   background-size:
     100% 100%,
     100% 100%,
     100% 100%,
-    36px 36px,
-    36px 36px;
+    160px 160px,
+    220px 220px;
   background-attachment: fixed;
 }
 
@@ -165,4 +165,79 @@ body {
 .map-shell {
   position: absolute;
   inset: 0;
+  background-color: #0a0e1f;
+  background-image: radial-gradient(circle at 50% 50%, rgba(124, 95, 255, 0.1), transparent 60%);
+}
+
+/* ---------- Cosmic glass utilities ---------- */
+
+.glass-card {
+  background-color: rgba(21, 25, 46, 0.55);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background-color: rgba(21, 25, 46, 0.6);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 26px;
+  font-family: 'Black Han Sans', 'Pretendard Variable', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background-image: linear-gradient(135deg, #7c5fff 0%, #5b3fe0 100%);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 8px 24px rgba(124, 95, 255, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.pill-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 12px 32px rgba(124, 95, 255, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.pill-btn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 4px 12px rgba(124, 95, 255, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.pill-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }

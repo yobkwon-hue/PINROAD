@@ -42,16 +42,22 @@ export default function HomePage() {
         className="absolute inset-0"
       />
 
+      {/* Top veil for contrast with map */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-space-deep/85 via-space-deep/40 to-transparent"
+      />
+
       {/* TOP BAR */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3">
-        <div className="pointer-events-auto mx-auto flex max-w-4xl flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3 sm:p-4">
+        <div className="pointer-events-auto mx-auto flex max-w-4xl items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="sticker inline-flex shrink-0 items-center gap-2 bg-bg px-3 py-2 hover:-translate-y-0.5 transition-transform"
+            className="glass-card flex shrink-0 items-center gap-2 px-3 py-2.5 transition-transform hover:-translate-y-0.5"
           >
-            <span className="font-display text-2xl leading-none text-holo">박제맵</span>
-            <span className="text-[10px] font-extrabold leading-none tracking-widest text-cyber-pink">
-              v1
+            <span className="text-base">🔒</span>
+            <span className="font-display text-base tracking-widest text-white">
+              BAKJE MAP
             </span>
           </Link>
 
@@ -61,39 +67,65 @@ export default function HomePage() {
 
           <Link
             href="/my"
-            className="sticker-btn shrink-0 bg-white text-sm text-black sm:!py-3"
+            className="glass-card flex shrink-0 items-center justify-center px-3 py-2.5 transition-transform hover:-translate-y-0.5"
+            aria-label="내 박제 보기"
           >
-            내 박제 →
+            <span className="text-base">👤</span>
           </Link>
         </div>
       </div>
 
       {/* EMPTY STATE */}
       {loaded && locks.length === 0 && (
-        <div className="pointer-events-none absolute inset-x-0 top-32 z-10 flex justify-center px-4">
-          <div className="sticker pointer-events-auto bg-white px-5 py-4 text-center animate-pop-in">
-            <div className="font-display text-xl text-black">아직 박제 0개</div>
-            <div className="mt-1 text-xs font-bold text-black/65">
+        <div className="pointer-events-none absolute inset-x-0 top-24 z-10 flex justify-center px-4 sm:top-28">
+          <div className="glass-card pointer-events-auto max-w-sm px-6 py-5 text-center animate-pop-in">
+            <div className="mb-1 inline-block text-5xl animate-wiggle">🔒</div>
+            <div className="font-display text-2xl leading-tight tracking-wide text-white">
+              아직 박제 0개
+            </div>
+            <div className="mt-1.5 text-sm text-white/65">
               1빠로 박제해 ㄱㄱ ✨
+            </div>
+            <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-extrabold tracking-widest text-lock-violet-light">
+              ↓ 박제하기 버튼을 눌러보세요
             </div>
           </div>
         </div>
       )}
 
-      {/* FAB */}
-      <button
-        onClick={() => setCreating(true)}
-        className="sticker-btn fixed bottom-5 right-5 z-30 bg-cyber-pink !px-5 !py-4 text-base text-white animate-pop-in"
-        aria-label="자물쇠 박제"
-      >
-        <span className="text-xl">🔒</span>
-        <span className="font-display tracking-wide">여기 박제</span>
-      </button>
+      {/* Counter chip above FAB */}
+      {loaded && locks.length > 0 && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-24 z-20 flex justify-center px-4">
+          <div className="glass-chip text-white/85">
+            <span>📍</span>
+            <span className="font-extrabold text-white">{locks.length}</span>
+            <span className="text-white/60">개의 마음</span>
+          </div>
+        </div>
+      )}
 
-      {/* Bottom counter */}
-      <div className="pointer-events-none absolute bottom-5 left-5 z-20">
-        <div className="sticker bg-bg/90 px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-cyber-blue">
-          📍 박제 {locks.length}개
+      {/* Loading chip (mutually exclusive with counter) */}
+      {!loaded && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-24 z-20 flex justify-center px-4">
+          <div className="glass-chip text-white/70">불러오는 중...</div>
+        </div>
+      )}
+
+      {/* FAB - bottom center pill */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-5 z-30 flex justify-center px-4">
+        <div className="pointer-events-auto relative">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -m-3 rounded-full bg-lock-violet opacity-50 blur-2xl"
+          />
+          <button
+            onClick={() => setCreating(true)}
+            className="pill-btn relative animate-pop-in"
+            aria-label="자물쇠 박제하기"
+          >
+            <span className="text-lg leading-none">＋</span>
+            <span>자물쇠 박제하기</span>
+          </button>
         </div>
       </div>
 
