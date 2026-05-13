@@ -11,3 +11,4 @@ next-env.d.ts
 
 # Claude Code personal override (settings.json + hooks/ are shared via repo)
 .claude/settings.local.json
+.claude/hooks/*.ps1
