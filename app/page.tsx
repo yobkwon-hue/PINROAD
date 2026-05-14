@@ -139,7 +139,14 @@ export default function HomePage() {
         </div>
       </div>
 
-      <LockModal lock={selected} onClose={() => setSelected(null)} />
+      <LockModal
+        lock={selected}
+        onClose={() => setSelected(null)}
+        onDeleted={() => {
+          setSelected(null);
+          fetchLocks();
+        }}
+      />
       {creating && (
         <CreateLockFlow
           onClose={() => setCreating(false)}

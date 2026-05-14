@@ -9,12 +9,17 @@ import { getAnonymousUserId } from '@/lib/anonymous-user';
 interface LockModalProps {
   lock: Lock | null;
   onClose: () => void;
+  onDeleted?: () => void;
 }
 
-export default function LockModal({ lock, onClose }: LockModalProps) {
+const DELETE_WINDOW_SEC = 60;
+
+export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) {
   const [likeCount, setLikeCount] = useState(0);
   const [liked, setLiked] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
     if (!lock) return;
@@ -32,6 +37,14 @@ export default function LockModal({ lock, onClose }: LockModalProps) {
     return () => {
       cancelled = true;
     };
+  }, [lock]);
+
+  // Tick once per second while the modal is open so the delete countdown stays live.
+  useEffect(() => {
+    if (!lock) return;
+    setNow(Date.now());
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
   }, [lock]);
 
   if (!lock) return null;
@@ -63,6 +76,33 @@ export default function LockModal({ lock, onClose }: LockModalProps) {
     }
   };
 
+  const createdMs = new Date(lock.created_at).getTime();
+  const ownedByMe = lock.user_id === getAnonymousUserId();
+  const elapsedSec = Math.max(0, Math.floor((now - createdMs) / 1000));
+  const remainingSec = Math.max(0, DELETE_WINDOW_SEC - elapsedSec);
+  const canDelete = ownedByMe && remainingSec > 0;
+  const countdownLabel = `${String(Math.floor(remainingSec / 60)).padStart(2, '0')}:${String(
+    remainingSec % 60,
+  ).padStart(2, '0')}`;
+
+  const handleDelete = async () => {
+    if (!canDelete || deleting) return;
+    if (!confirm('이 박제 진짜 지움? 못 돌림.')) return;
+    setDeleting(true);
+    const { error } = await supabase
+      .from('locks')
+      .delete()
+      .eq('id', lock.id)
+      .eq('user_id', getAnonymousUserId());
+    setDeleting(false);
+    if (error) {
+      alert('삭제 실패 ㅠ');
+      return;
+    }
+    onDeleted?.();
+    onClose();
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-3 backdrop-blur-sm sm:items-center sm:p-6"
@@ -90,6 +130,11 @@ export default function LockModal({ lock, onClose }: LockModalProps) {
           <div className="relative" dangerouslySetInnerHTML={{ __html: svg }} />
         </div>
 
+        {/* tagline */}
+        <p className="mb-3 text-center font-display text-sm tracking-wide text-black/55">
+          &ldquo;한번 잠근 마음은 풀 수 없어요.&rdquo;
+        </p>
+
         {/* badge */}
         <div className="mb-3 flex justify-center gap-1.5">
           <span className={`chip ${meta.pill}`}>
@@ -111,8 +156,40 @@ export default function LockModal({ lock, onClose }: LockModalProps) {
           <span>{date}</span>
         </div>
 
-        {/* like */}
-        <div className="mt-4 flex justify-center">
+        {/* delete countdown / status */}
+        {ownedByMe && (
+          <div className="mt-4 sticker bg-bg-soft px-4 py-2.5 text-center">
+            {canDelete ? (
+              <>
+                <div className="text-[10px] font-extrabold tracking-widest text-cyber-pink">
+                  ⏳ 삭제 가능 시간
+                </div>
+                <div className="mt-0.5 font-display text-2xl tabular-nums text-white">
+                  {countdownLabel}
+                </div>
+                <div className="mt-0.5 text-[11px] font-bold text-white/55">
+                  박제 1분 안에만 지울 수 있음
+                </div>
+              </>
+            ) : (
+              <div className="text-xs font-extrabold text-white/70">
+                🔒 1분 지났어요 — 영원히 박제됨
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* actions */}
+        <div className="mt-4 flex justify-center gap-2">
+          {canDelete && (
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="sticker-btn bg-white text-sm text-black"
+            >
+              {deleting ? '지우는 중...' : '삭제하기'}
+            </button>
+          )}
           <button
             onClick={toggleLike}
             disabled={busy}
