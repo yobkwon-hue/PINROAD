@@ -10,6 +10,7 @@ import { buildLockSvg } from '@/lib/lockSvg';
 import { timeAgo } from '@/lib/timeAgo';
 import SearchBar from '@/components/SearchBar';
 import LockModal from '@/components/LockModal';
+import HomeSideBar from '@/components/HomeSideBar';
 import { toast } from '@/components/Toast';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
@@ -146,6 +147,9 @@ export default function HomePage() {
         selectedLockId={selected?.id ?? null}
         className="absolute inset-0 z-0"
       />
+
+      {/* Desktop-only sidebar */}
+      <HomeSideBar count={locks.length} onCreate={() => setCreating(true)} />
 
       {/* TOP BAR */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3">
@@ -303,8 +307,10 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Bottom-left cluster: counter + locate-me */}
-      <div className="absolute bottom-5 left-5 z-20 flex flex-col gap-2">
+      {/* Bottom-left cluster: counter + locate-me.
+          On lg the sidebar already shows the count, so the chip is hidden
+          and the locate button is shifted right past the sidebar. */}
+      <div className="absolute bottom-5 left-5 z-20 flex flex-col gap-2 lg:left-[284px]">
         <button
           onClick={locateMe}
           disabled={locating}
@@ -315,7 +321,7 @@ export default function HomePage() {
         </button>
         <div
           key={locks.length}
-          className="sticker bg-bg/90 px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-cyber-blue animate-pop-in"
+          className="sticker bg-bg/90 px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-cyber-blue animate-pop-in lg:hidden"
         >
           📍 박제 {locks.length}개
         </div>
