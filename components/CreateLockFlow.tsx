@@ -17,9 +17,15 @@ import { buildLockSvg } from '@/lib/lockSvg';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
+interface CreatedLock {
+  id: string;
+  lat: number;
+  lng: number;
+}
+
 interface Props {
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (created?: CreatedLock) => void;
 }
 
 const COLORS: LockColor[] = ['pink', 'red', 'yellow', 'sky', 'purple'];
@@ -121,6 +127,8 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
     }
     if (visibility === 'link' && data?.share_token) {
       setSavedToken(data.share_token);
+    } else if (data) {
+      onCreated({ id: data.id, lat: data.lat, lng: data.lng });
     } else {
       onCreated();
     }

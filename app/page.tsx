@@ -80,7 +80,7 @@ export default function HomePage() {
     }
   }, [router]);
 
-  const fetchLocks = useCallback(async () => {
+  const fetchLocks = useCallback(async (): Promise<Lock[]> => {
     let q = supabase
       .from('locks')
       .select('*')
@@ -88,8 +88,10 @@ export default function HomePage() {
       .limit(500);
     q = filter === 'all' ? q.eq('visibility', 'public') : q.eq('visibility', filter);
     const { data, error } = await q;
-    if (!error && data) setLocks(data as Lock[]);
+    const rows = !error && data ? (data as Lock[]) : [];
+    setLocks(rows);
     setLoaded(true);
+    return rows;
   }, [filter]);
 
   useEffect(() => {
@@ -286,9 +288,14 @@ export default function HomePage() {
       {creating && (
         <CreateLockFlow
           onClose={() => setCreating(false)}
-          onCreated={() => {
+          onCreated={async (created) => {
             setCreating(false);
-            fetchLocks();
+            const rows = await fetchLocks();
+            if (created) {
+              setCenter({ lat: created.lat, lng: created.lng });
+              const fresh = rows.find((r) => r.id === created.id);
+              if (fresh) setSelected(fresh);
+            }
           }}
         />
       )}
