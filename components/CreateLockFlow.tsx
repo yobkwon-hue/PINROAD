@@ -246,6 +246,12 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
             setTitle={setTitle}
             body={body}
             setBody={setBody}
+            onResetDraft={() => {
+              setTitle('');
+              setBody('');
+              clearDraft();
+              toast('임시 저장 지움 ↺', 'info');
+            }}
           />
         ) : step === 3 ? (
           <Step3Design
@@ -340,17 +346,33 @@ function Step2Message({
   setTitle,
   body,
   setBody,
+  onResetDraft,
 }: {
   title: string;
   setTitle: (v: string) => void;
   body: string;
   setBody: (v: string) => void;
+  onResetDraft: () => void;
 }) {
+  const hasDraft = title.length > 0 || body.length > 0;
   return (
     <div className="mx-auto max-w-md p-5">
-      <h2 className="font-display text-3xl text-white">
-        마음 적기 <span className="text-holo">✏️</span>
-      </h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-display text-3xl text-white">
+          마음 적기 <span className="text-holo">✏️</span>
+        </h2>
+        {hasDraft && (
+          <button
+            type="button"
+            onClick={onResetDraft}
+            className="sticker !px-2.5 !py-1 bg-bg-soft text-[10px] font-extrabold tracking-widest text-white/70 hover:text-white"
+            aria-label="임시 저장 초기화"
+            title="입력 내용 지우기"
+          >
+            ↺ 초기화
+          </button>
+        )}
+      </div>
       <p className="mt-1 text-sm text-white/60">한번 박제하면 못 지움.. ㄹㅇ 신중히</p>
 
       <div className="mt-6">

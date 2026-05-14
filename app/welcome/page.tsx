@@ -112,10 +112,14 @@ export default function WelcomePage() {
           </p>
 
           <div className="mt-4 grid grid-cols-2 gap-3">
-            {FEATURES.map((f) => (
+            {FEATURES.map((f, i) => (
               <div
                 key={f.title}
-                className="sticker bg-bg p-3 text-left"
+                className="sticker bg-bg p-3 text-left animate-pop-in"
+                style={{
+                  animationDelay: `${340 + i * 90}ms`,
+                  animationFillMode: 'backwards',
+                }}
               >
                 <div className="text-2xl leading-none">{f.icon}</div>
                 <div className="mt-2 text-xs font-extrabold text-white">{f.title}</div>
