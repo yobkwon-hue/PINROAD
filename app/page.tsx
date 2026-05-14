@@ -121,6 +121,22 @@ export default function HomePage() {
     fetchLocks();
   }, [fetchLocks]);
 
+  // Hash deep-link: /#lock-<id> opens that lock's modal once locks have
+  // loaded (assuming the lock is in the current filter's result set).
+  useEffect(() => {
+    if (!loaded || typeof window === 'undefined') return;
+    const m = window.location.hash.match(/^#lock-(.+)$/);
+    if (!m) return;
+    const id = decodeURIComponent(m[1]);
+    const target = locks.find((l) => l.id === id);
+    if (target) {
+      setSelected(target);
+      setCenter({ lat: target.lat, lng: target.lng });
+      // Clear the hash so a second visit/close doesn't re-trigger
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, [loaded, locks]);
+
   return (
     <div className="relative h-dvh w-full overflow-hidden">
       <MapView

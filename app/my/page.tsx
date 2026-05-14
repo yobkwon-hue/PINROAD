@@ -75,6 +75,26 @@ export default function MyPage() {
             ←
           </Link>
           <h1 className="font-display text-2xl text-holo">내 박제</h1>
+          {locks.length > 0 && (
+            <button
+              onClick={() => {
+                const blob = new Blob([JSON.stringify(locks, null, 2)], {
+                  type: 'application/json',
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `bakje-map-${new Date().toISOString().slice(0, 10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="sticker !py-1.5 !px-2.5 bg-bg-soft text-[11px] font-extrabold text-white hover:-translate-y-0.5 transition-transform"
+              aria-label="내 박제 JSON 내보내기"
+              title="JSON 내보내기"
+            >
+              ⬇️ JSON
+            </button>
+          )}
           <div className="ml-auto chip bg-cyber-pink">총 {locks.length}</div>
         </div>
 
