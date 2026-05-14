@@ -11,77 +11,65 @@ export default function SearchBar({ onResult }: SearchBarProps) {
   const [searching, setSearching] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || typeof window === 'undefined') return;
-    if (!window.naver?.maps?.Service) {
-      setErr('지도 SDK 아직 로딩중.. 잠시 후 다시');
-      return;
-    }
+    if (!query.trim()) return;
     setErr(null);
     setSearching(true);
-    window.naver.maps.Service.geocode(
-      { query },
-      (status: any, response: any) => {
-        setSearching(false);
-        if (status !== window.naver.maps.Service.Status.OK) {
-          setErr('못 찾음 ㅠ');
-          return;
-        }
-        const items = response?.v2?.addresses;
-        if (!items || items.length === 0) {
-          setErr('결과 없음');
-          return;
-        }
-        const r = items[0];
-        const lat = parseFloat(r.y);
-        const lng = parseFloat(r.x);
-        const name = r.roadAddress || r.jibunAddress || query;
-        onResult(lat, lng, name);
-      },
-    );
+    try {
+      const url = new URL('https://nominatim.openstreetmap.org/search');
+      url.searchParams.set('q', query);
+      url.searchParams.set('format', 'json');
+      url.searchParams.set('limit', '1');
+      url.searchParams.set('accept-language', 'ko');
+      const res = await fetch(url.toString(), {
+        headers: { Accept: 'application/json' },
+      });
+      const data = (await res.json()) as Array<{
+        lat: string;
+        lon: string;
+        display_name: string;
+      }>;
+      if (!data || data.length === 0) {
+        setErr('결과 없음');
+        return;
+      }
+      const r = data[0];
+      onResult(parseFloat(r.lat), parseFloat(r.lon), r.display_name);
+    } catch {
+      setErr('검색 실패 ㅠ');
+    } finally {
+      setSearching(false);
+    }
   };
-
-  const trimmed = query.trim();
 
   return (
     <div className="relative">
       <form
         onSubmit={handleSearch}
-        className="glass-card flex items-center gap-2 px-3 py-2"
+        className="sticker flex items-stretch overflow-hidden bg-white"
       >
-        <span
-          aria-hidden
-          className="shrink-0 select-none text-base leading-none text-white/55"
-        >
-          {searching ? (
-            <span className="inline-block animate-spin">⟳</span>
-          ) : (
-            '🔍'
-          )}
-        </span>
         <input
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
             setErr(null);
           }}
-          placeholder="장소를 검색하세요 (예: 홍대, 남산)"
-          className="flex-1 bg-transparent text-sm font-medium text-white placeholder:text-white/40 outline-none"
+          placeholder="어디 박제할까? 🔍 (예: 홍대, 남산)"
+          className="flex-1 bg-transparent px-4 py-3 text-sm font-semibold text-black placeholder:text-black/40 outline-none"
         />
-        {trimmed && (
-          <button
-            type="submit"
-            disabled={searching}
-            className="shrink-0 rounded-full bg-lock-violet px-3 py-1 text-xs font-extrabold text-white shadow-glow-violet transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-          >
-            {searching ? '...' : '검색'}
-          </button>
-        )}
+        <button
+          type="submit"
+          disabled={searching || !query.trim()}
+          className="bg-cyber-pink px-4 py-3 text-sm font-extrabold text-white disabled:opacity-50"
+          style={{ borderLeft: '3px solid #000' }}
+        >
+          {searching ? '...' : 'GO'}
+        </button>
       </form>
       {err && (
-        <div className="absolute left-0 right-0 top-full z-10 mt-1.5 px-1">
-          <div className="glass-chip inline-flex text-white">⚠️ {err}</div>
+        <div className="absolute left-0 right-0 top-full mt-1 z-10">
+          <div className="chip bg-neon-yellow inline-block">{err}</div>
         </div>
       )}
     </div>

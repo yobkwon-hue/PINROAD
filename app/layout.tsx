@@ -1,6 +1,6 @@
 import './globals.css';
+import 'leaflet/dist/leaflet.css';
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: '박제맵 — 여기 내 마음 박제함',
@@ -15,15 +15,8 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const naverKeyId = process.env.NEXT_PUBLIC_NAVER_MAP_KEY_ID ?? '';
   return (
     <html lang="ko">
-      <head>
-        <Script
-          src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${naverKeyId}&submodules=geocoder`}
-          strategy="afterInteractive"
-        />
-      </head>
       <body>{children}</body>
     </html>
   );

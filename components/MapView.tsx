@@ -4,11 +4,10 @@ import { useEffect, useRef } from 'react';
 import { Lock } from '@/lib/types';
 import { buildLockSvg, pickerSvg } from '@/lib/lockSvg';
 
-declare global {
-  interface Window {
-    naver: any;
-  }
-}
+// Leaflet is dynamically required inside effects to avoid SSR issues
+type LeafletNS = typeof import('leaflet');
+type Map = import('leaflet').Map;
+type Marker = import('leaflet').Marker;
 
 interface MapViewProps {
   locks: Lock[];
@@ -16,7 +15,7 @@ interface MapViewProps {
   onMapClick?: (lat: number, lng: number) => void;
   selectedPosition?: { lat: number; lng: number } | null;
   initialCenter?: { lat: number; lng: number };
-  initialLevel?: number; // Naver zoom: 6~21, ~14 ≈ Kakao level 5
+  initialLevel?: number; // Leaflet zoom: ~13 ≈ city level
   className?: string;
 }
 
@@ -30,88 +29,97 @@ export default function MapView({
   onPinClick,
   onMapClick,
   selectedPosition,
-  initialCenter = { lat: 37.5512, lng: 126.9882 }, // Namsan
-  initialLevel = 14,
+  initialCenter = { lat: 37.5512, lng: 126.9882 }, // Namsan default
+  initialLevel = 13,
   className = '',
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
-  const pickerRef = useRef<any>(null);
+  const mapRef = useRef<Map | null>(null);
+  const markersRef = useRef<Marker[]>([]);
+  const pickerRef = useRef<Marker | null>(null);
+  const LRef = useRef<LeafletNS | null>(null);
 
-  // Init — poll until Naver SDK is loaded
+  // Init map
   useEffect(() => {
     let cancelled = false;
-    let interval: ReturnType<typeof setInterval> | null = null;
 
-    const tryInit = () => {
-      if (cancelled) return;
-      if (typeof window === 'undefined' || !window.naver?.maps) return;
-      if (!containerRef.current || mapRef.current) return;
+    (async () => {
+      if (typeof window === 'undefined') return;
+      const L = (await import('leaflet')).default ?? (await import('leaflet'));
+      if (cancelled || !containerRef.current || mapRef.current) return;
+      LRef.current = L;
 
-      const map = new window.naver.maps.Map(containerRef.current, {
-        center: new window.naver.maps.LatLng(initialCenter.lat, initialCenter.lng),
+      const map = L.map(containerRef.current, {
+        center: [initialCenter.lat, initialCenter.lng],
         zoom: initialLevel,
-        zoomControl: true,
-        zoomControlOptions: {
-          position: window.naver.maps.Position.RIGHT_BOTTOM,
-        },
-        scaleControl: false,
-        mapDataControl: false,
-        logoControlOptions: { position: window.naver.maps.Position.BOTTOM_LEFT },
+        zoomControl: false,
+        attributionControl: true,
       });
-      mapRef.current = map;
+
+      // Carto Dark Matter tiles — fits Y2K dark aesthetic perfectly
+      L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20,
+        },
+      ).addTo(map);
+
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
 
       if (onMapClick) {
-        window.naver.maps.Event.addListener(map, 'click', (e: any) => {
-          onMapClick(e.coord.lat(), e.coord.lng());
+        map.on('click', (e) => {
+          onMapClick(e.latlng.lat, e.latlng.lng);
         });
       }
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
-    };
 
-    tryInit();
-    interval = setInterval(tryInit, 300);
+      mapRef.current = map;
+
+      // Force a size recalculation after initial layout
+      setTimeout(() => map.invalidateSize(), 50);
+    })();
 
     return () => {
       cancelled = true;
-      if (interval) clearInterval(interval);
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+      markersRef.current = [];
+      pickerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Pan to center when it changes
   useEffect(() => {
-    if (!mapRef.current || !window.naver) return;
-    const latlng = new window.naver.maps.LatLng(initialCenter.lat, initialCenter.lng);
-    mapRef.current.panTo(latlng);
+    if (!mapRef.current) return;
+    mapRef.current.panTo([initialCenter.lat, initialCenter.lng]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialCenter.lat, initialCenter.lng]);
 
   // Render lock markers
   useEffect(() => {
-    if (!mapRef.current || !window.naver) return;
-    markersRef.current.forEach((m) => m.setMap(null));
+    const map = mapRef.current;
+    const L = LRef.current;
+    if (!map || !L) return;
+
+    markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
     locks.forEach((lock) => {
       const svg = buildLockSvg(lock.color, lock.shape, MARKER_W);
-      // Wrap in a positioned div so we can bottom-center anchor cleanly
-      const html = `<div style="width:${MARKER_W}px;height:${MARKER_H}px;line-height:0;cursor:pointer;">${svg}</div>`;
-      const marker = new window.naver.maps.Marker({
-        position: new window.naver.maps.LatLng(lock.lat, lock.lng),
-        map: mapRef.current,
-        icon: {
-          content: html,
-          size: new window.naver.maps.Size(MARKER_W, MARKER_H),
-          anchor: new window.naver.maps.Point(MARKER_W / 2, MARKER_H - 6),
-        },
+      const icon = L.divIcon({
+        html: `<div style="width:${MARKER_W}px;height:${MARKER_H}px;line-height:0;cursor:pointer;">${svg}</div>`,
+        className: 'lockmap-marker',
+        iconSize: [MARKER_W, MARKER_H],
+        iconAnchor: [MARKER_W / 2, MARKER_H - 6],
       });
+      const marker = L.marker([lock.lat, lock.lng], { icon }).addTo(map);
       if (onPinClick) {
-        window.naver.maps.Event.addListener(marker, 'click', () => onPinClick(lock));
+        marker.on('click', () => onPinClick(lock));
       }
       markersRef.current.push(marker);
     });
@@ -120,26 +128,28 @@ export default function MapView({
 
   // Picker marker
   useEffect(() => {
-    if (!mapRef.current || !window.naver) return;
+    const map = mapRef.current;
+    const L = LRef.current;
+    if (!map || !L) return;
 
     if (pickerRef.current) {
-      pickerRef.current.setMap(null);
+      pickerRef.current.remove();
       pickerRef.current = null;
     }
 
     if (selectedPosition) {
       const svg = pickerSvg(PICKER_W);
-      const html = `<div style="width:${PICKER_W}px;height:${PICKER_H}px;line-height:0;pointer-events:none;">${svg}</div>`;
-      const m = new window.naver.maps.Marker({
-        position: new window.naver.maps.LatLng(selectedPosition.lat, selectedPosition.lng),
-        map: mapRef.current,
-        icon: {
-          content: html,
-          size: new window.naver.maps.Size(PICKER_W, PICKER_H),
-          anchor: new window.naver.maps.Point(PICKER_W / 2, PICKER_H - 6),
-        },
-        zIndex: 100,
+      const icon = L.divIcon({
+        html: `<div style="width:${PICKER_W}px;height:${PICKER_H}px;line-height:0;pointer-events:none;">${svg}</div>`,
+        className: 'lockmap-picker',
+        iconSize: [PICKER_W, PICKER_H],
+        iconAnchor: [PICKER_W / 2, PICKER_H - 6],
       });
+      const m = L.marker([selectedPosition.lat, selectedPosition.lng], {
+        icon,
+        zIndexOffset: 1000,
+        interactive: false,
+      }).addTo(map);
       pickerRef.current = m;
     }
   }, [selectedPosition]);

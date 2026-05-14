@@ -54,28 +54,33 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
     );
   }
 
-  function reverseGeocode(lat: number, lng: number) {
-    if (typeof window === 'undefined' || !(window as any).naver?.maps?.Service) return;
-    const naver = (window as any).naver;
-    naver.maps.Service.reverseGeocode(
-      {
-        coords: new naver.maps.LatLng(lat, lng),
-        orders: [
-          naver.maps.Service.OrderType.ADDR,
-          naver.maps.Service.OrderType.ROAD_ADDR,
-        ].join(','),
-      },
-      (status: any, response: any) => {
-        if (status !== naver.maps.Service.Status.OK) return;
-        const result = response?.v2?.results?.[0];
-        if (!result) return;
-        const r = result.region;
-        const name = [r?.area1?.name, r?.area2?.name, r?.area3?.name]
-          .filter(Boolean)
-          .join(' ');
-        if (name) setLocationName(name);
-      },
-    );
+  async function reverseGeocode(lat: number, lng: number) {
+    try {
+      const url = new URL('https://nominatim.openstreetmap.org/reverse');
+      url.searchParams.set('lat', String(lat));
+      url.searchParams.set('lon', String(lng));
+      url.searchParams.set('format', 'json');
+      url.searchParams.set('accept-language', 'ko');
+      url.searchParams.set('zoom', '14');
+      const res = await fetch(url.toString(), {
+        headers: { Accept: 'application/json' },
+      });
+      const data = (await res.json()) as {
+        display_name?: string;
+        address?: Record<string, string>;
+      };
+      // Prefer Korean-style short hierarchy: city/borough/neighborhood
+      const a = data?.address ?? {};
+      const parts = [
+        a.city ?? a.province ?? a.state,
+        a.borough ?? a.county ?? a.suburb,
+        a.neighbourhood ?? a.quarter ?? a.village,
+      ].filter(Boolean);
+      const name = parts.join(' ') || data?.display_name || '';
+      if (name) setLocationName(name);
+    } catch {
+      /* keep coordinates as fallback */
+    }
   }
 
   function handlePick(lat: number, lng: number) {
@@ -232,19 +237,19 @@ function Step1Location({
         selectedPosition={position}
         className="absolute inset-0"
       />
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center">
+      <div className="pointer-events-none absolute inset-x-0 top-3 z-[500] flex justify-center">
         <div className="sticker pointer-events-auto bg-white px-4 py-2 text-sm font-extrabold text-black">
           여기다 박제? 📍 지도 찍어
         </div>
       </div>
       <button
         onClick={onUseCurrent}
-        className="sticker-btn absolute right-3 top-16 z-10 bg-cyber-blue text-sm text-black"
+        className="sticker-btn absolute right-3 top-16 z-[500] bg-cyber-blue text-sm text-black"
       >
         📡 현위치
       </button>
       {position && (
-        <div className="absolute inset-x-3 bottom-3 z-10">
+        <div className="absolute inset-x-3 bottom-3 z-[500]">
           <div className="sticker bg-white px-4 py-3 animate-slide-up">
             <div className="text-[10px] font-extrabold tracking-widest text-cyber-pink">
               📍 SPOT LOCKED
