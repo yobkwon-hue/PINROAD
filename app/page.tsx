@@ -43,6 +43,7 @@ export default function HomePage() {
     return window.matchMedia('(min-width: 640px)').matches;
   });
   const [locating, setLocating] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const locateMe = () => {
     if (!navigator.geolocation) {
@@ -74,6 +75,33 @@ export default function HomePage() {
       /* private mode etc. — just stay on home */
     }
   }, [router]);
+
+  // Keyboard shortcuts on the home page.
+  // - "n" → open the create flow
+  // - "?" → open the help cheatsheet
+  // - "Esc" → close help (modal close is handled by LockModal itself)
+  // Skip when the user is typing in a form field so we don't hijack input.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName;
+      const inField =
+        tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable;
+      if (inField) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        setCreating(true);
+      } else if (e.key === '?') {
+        e.preventDefault();
+        setHelpOpen(true);
+      } else if (e.key === 'Escape' && helpOpen) {
+        setHelpOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [helpOpen]);
 
   const fetchLocks = useCallback(async (): Promise<Lock[]> => {
     let q = supabase
@@ -188,11 +216,62 @@ export default function HomePage() {
       <button
         onClick={() => setCreating(true)}
         className="sticker-btn fixed bottom-5 left-1/2 z-30 -translate-x-1/2 bg-cyber-pink !px-5 !py-4 text-base text-white shadow-glow-pink animate-pop-in"
-        aria-label="자물쇠 박제"
+        aria-label="자물쇠 박제 (단축키: n)"
       >
         <span className="text-xl">🔒</span>
         <span className="font-display tracking-wide">여기 박제</span>
       </button>
+
+      {/* Help button (bottom-right, small) */}
+      <button
+        onClick={() => setHelpOpen(true)}
+        aria-label="단축키 도움말 (?)"
+        className="sticker fixed bottom-5 right-5 z-20 bg-bg/90 px-3 py-2 text-xs font-extrabold text-white hover:-translate-y-0.5 transition-transform"
+      >
+        ?
+      </button>
+
+      {/* Help modal */}
+      {helpOpen && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm"
+          onClick={() => setHelpOpen(false)}
+        >
+          <div
+            className="sticker-lg w-full max-w-sm animate-pop-in bg-white p-5 text-black"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="font-display text-2xl">단축키</div>
+              <button
+                onClick={() => setHelpOpen(false)}
+                aria-label="닫기"
+                className="text-xl font-extrabold text-black/40 hover:text-black"
+              >
+                ✕
+              </button>
+            </div>
+            <ul className="mt-3 space-y-2 text-sm font-bold">
+              <li className="flex justify-between gap-3">
+                <span>장소 검색 포커스</span>
+                <kbd className="chip bg-neon-yellow">/</kbd>
+              </li>
+              <li className="flex justify-between gap-3">
+                <span>새 박제 시작</span>
+                <kbd className="chip bg-cyber-pink text-white">n</kbd>
+              </li>
+              <li className="flex justify-between gap-3">
+                <span>모달 / 도움말 닫기</span>
+                <kbd className="chip bg-bg-soft text-white">Esc</kbd>
+              </li>
+              <li className="flex justify-between gap-3">
+                <span>이 화면 열기</span>
+                <kbd className="chip bg-neon-yellow">?</kbd>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
 
       {/* Bottom-left cluster: counter + locate-me */}
       <div className="absolute bottom-5 left-5 z-20 flex flex-col gap-2">

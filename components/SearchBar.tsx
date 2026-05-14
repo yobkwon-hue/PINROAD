@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface SearchBarProps {
   onResult: (lat: number, lng: number, name: string) => void;
@@ -10,6 +10,23 @@ export default function SearchBar({ onResult }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // "/" anywhere focuses search — skip if user is already typing in a field
+  // or holding a modifier so it doesn't fight platform shortcuts.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || t?.isContentEditable) return;
+      e.preventDefault();
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,14 +67,15 @@ export default function SearchBar({ onResult }: SearchBarProps) {
         className="sticker flex items-stretch overflow-hidden bg-white"
       >
         <input
+          ref={inputRef}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
             setErr(null);
           }}
-          placeholder="어디 박제할까? 🔍 (예: 홍대, 남산)"
+          placeholder="어디 박제할까? 🔍 (예: 홍대, 남산)  단축키 /"
           className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm font-semibold text-black placeholder:text-black/40 outline-none"
-          aria-label="장소 검색"
+          aria-label="장소 검색 (단축키: /)"
         />
         {query && (
           <button
