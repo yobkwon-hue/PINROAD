@@ -254,6 +254,30 @@ textarea:focus-visible {
   color: #fff !important;
 }
 
+.lockmap-tooltip {
+  background: #fff !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+  font-size: 12px !important;
+  padding: 6px 10px !important;
+  border: 3px solid #000 !important;
+  border-radius: 10px !important;
+  box-shadow: 3px 3px 0 #000 !important;
+  white-space: nowrap;
+}
+
+.lockmap-tooltip::before {
+  border-top-color: #000 !important;
+}
+
+.lockmap-tooltip .lt-loc {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.55);
+  margin-top: 2px;
+}
+
 .leaflet-control-attribution {
   background: rgba(11, 11, 20, 0.85) !important;
   color: rgba(255, 255, 255, 0.6) !important;

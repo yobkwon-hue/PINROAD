@@ -33,17 +33,67 @@ const COLORS: LockColor[] = ['pink', 'red', 'yellow', 'sky', 'purple'];
 const SHAPES: LockShape[] = ['heart', 'square', 'circle'];
 const VISIBILITIES: LockVisibility[] = ['public', 'private', 'link'];
 
+const DRAFT_KEY = 'bakje_draft_v1';
+
+interface Draft {
+  title: string;
+  body: string;
+  color: LockColor;
+  shape: LockShape;
+  visibility: LockVisibility;
+  position: { lat: number; lng: number } | null;
+  locationName: string;
+}
+
+function loadDraft(): Partial<Draft> | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as Partial<Draft>;
+  } catch {
+    return null;
+  }
+}
+
+function saveDraft(d: Draft) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+  } catch {
+    /* quota / private mode — silently ignore */
+  }
+}
+
+function clearDraft() {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 export default function CreateLockFlow({ onClose, onCreated }: Props) {
+  const initial = typeof window !== 'undefined' ? loadDraft() : null;
   const [step, setStep] = useState(1);
-  const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
-  const [locationName, setLocationName] = useState('');
-  const [title, setTitle] = useState('');
-  const [body, setBody] = useState('');
-  const [color, setColor] = useState<LockColor>('pink');
-  const [shape, setShape] = useState<LockShape>('heart');
-  const [visibility, setVisibility] = useState<LockVisibility>('public');
+  const [position, setPosition] = useState<{ lat: number; lng: number } | null>(
+    initial?.position ?? null,
+  );
+  const [locationName, setLocationName] = useState(initial?.locationName ?? '');
+  const [title, setTitle] = useState(initial?.title ?? '');
+  const [body, setBody] = useState(initial?.body ?? '');
+  const [color, setColor] = useState<LockColor>(initial?.color ?? 'pink');
+  const [shape, setShape] = useState<LockShape>(initial?.shape ?? 'heart');
+  const [visibility, setVisibility] = useState<LockVisibility>(initial?.visibility ?? 'public');
   const [saving, setSaving] = useState(false);
   const [savedToken, setSavedToken] = useState<string | null>(null);
+
+  // Persist a draft on every meaningful change so a closed-by-accident
+  // flow doesn't lose the user's typing. Cleared on submit success.
+  useEffect(() => {
+    saveDraft({ title, body, color, shape, visibility, position, locationName });
+  }, [title, body, color, shape, visibility, position, locationName]);
 
   function useCurrentLocation() {
     if (!navigator.geolocation) {
@@ -126,6 +176,7 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
       toast('박제 실패 ㅠ 다시 ㄱㄱ', 'error');
       return;
     }
+    clearDraft();
     toast('박제 완료 🔒✨', 'success');
     if (visibility === 'link' && data?.share_token) {
       setSavedToken(data.share_token);

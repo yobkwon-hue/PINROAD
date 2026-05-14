@@ -121,6 +121,15 @@ export default function MapView({
         iconAnchor: [MARKER_W / 2, MARKER_H - 6],
       });
       const marker = L.marker([lock.lat, lock.lng], { icon }).addTo(map);
+      const tip = lock.location_name
+        ? `${lock.title}<br><span class="lt-loc">📍 ${lock.location_name}</span>`
+        : lock.title;
+      marker.bindTooltip(tip, {
+        direction: 'top',
+        offset: [0, -MARKER_H + 12],
+        className: 'lockmap-tooltip',
+        opacity: 1,
+      });
       if (onPinClick) {
         marker.on('click', () => onPinClick(lock));
       }
