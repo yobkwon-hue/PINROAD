@@ -122,6 +122,32 @@ export default function HomePage() {
     fetchLocks();
   }, [fetchLocks]);
 
+  // Live updates — if the supabase publication for `locks` is enabled
+  // server-side, new public rows will stream in and pop onto the map
+  // without a manual refresh. Falls back silently if realtime isn't set up.
+  useEffect(() => {
+    if (filter !== 'all' && filter !== 'public') return;
+    const channel = supabase
+      .channel('public-locks-stream')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'locks' },
+        (payload) => {
+          const row = payload.new as Lock;
+          if (row.visibility !== 'public') return;
+          setLocks((prev) => {
+            if (prev.some((l) => l.id === row.id)) return prev;
+            return [row, ...prev];
+          });
+          toast('새 박제가 올라왔어요 ✨', 'info');
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [filter]);
+
   // Hash deep-link: /#lock-<id> opens that lock's modal once locks have
   // loaded (assuming the lock is in the current filter's result set).
   useEffect(() => {
