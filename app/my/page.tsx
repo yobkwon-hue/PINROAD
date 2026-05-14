@@ -21,14 +21,18 @@ export default function MyPage() {
   const [selected, setSelected] = useState<Lock | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchLocks = () => {
     const uid = getAnonymousUserId();
-    supabase
+    return supabase
       .rpc('get_my_locks', { p_user_id: uid })
       .then(({ data, error }) => {
         if (!error && data) setLocks(data as Lock[]);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchLocks();
   }, []);
 
   const filtered = useMemo(
@@ -119,12 +123,19 @@ export default function MyPage() {
           <MapView
             locks={filtered}
             onPinClick={setSelected}
-            className="absolute inset-0"
+            className="absolute inset-0 z-0"
           />
         </div>
       )}
 
-      <LockModal lock={selected} onClose={() => setSelected(null)} />
+      <LockModal
+        lock={selected}
+        onClose={() => setSelected(null)}
+        onDeleted={() => {
+          setSelected(null);
+          fetchLocks();
+        }}
+      />
     </div>
   );
 }

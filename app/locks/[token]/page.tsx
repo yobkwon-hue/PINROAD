@@ -79,6 +79,10 @@ export default function LinkLockPage() {
             <div dangerouslySetInnerHTML={{ __html: svg }} />
           </div>
 
+          <p className="mb-3 text-center font-display text-sm tracking-wide text-black/55">
+            &ldquo;한번 잠근 마음은 풀 수 없어요.&rdquo;
+          </p>
+
           <h1 className="text-center font-display text-3xl leading-tight">
             {lock.title}
           </h1>
