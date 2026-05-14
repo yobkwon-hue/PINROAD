@@ -203,8 +203,8 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-40 flex animate-fade-in flex-col bg-bg/95 backdrop-blur-md">
-      <header className="flex shrink-0 items-center justify-between border-b-2 border-black/40 bg-bg/90 px-4 py-3">
+    <div className="fixed inset-0 z-40 flex animate-fade-in flex-col bg-bg/95 backdrop-blur-md lg:left-auto lg:right-3 lg:top-3 lg:bottom-3 lg:w-[420px] lg:rounded-3xl lg:border-[3px] lg:border-black lg:shadow-sticker-lg">
+      <header className="flex shrink-0 items-center justify-between border-b-2 border-black/40 bg-bg/90 px-4 py-3 lg:rounded-t-3xl">
         <button
           onClick={back}
           className="sticker-btn !py-2 !px-3 bg-white text-sm text-black"

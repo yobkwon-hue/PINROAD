@@ -141,11 +141,11 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-3 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-3 backdrop-blur-sm sm:items-center sm:p-6 lg:items-stretch lg:justify-end lg:bg-black/40 lg:p-3"
       onClick={onClose}
     >
       <div
-        className="sticker-lg relative w-full max-w-md animate-pop-in bg-white p-6 text-black"
+        className="sticker-lg relative w-full max-w-md animate-pop-in bg-white p-6 text-black lg:my-0 lg:max-h-full lg:max-w-[380px] lg:overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* close */}
