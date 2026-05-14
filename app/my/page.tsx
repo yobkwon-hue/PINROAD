@@ -105,7 +105,21 @@ export default function MyPage() {
       </header>
 
       {loading ? (
-        <div className="p-10 text-center text-white/60">박제 불러오는 중...</div>
+        <div className="mx-auto max-w-2xl space-y-3 p-3">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="sticker flex items-start gap-3 bg-white/10 p-4 animate-pulse"
+            >
+              <div className="h-14 w-14 shrink-0 rounded-xl bg-white/20" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="h-3 w-1/3 rounded bg-white/20" />
+                <div className="h-4 w-2/3 rounded bg-white/20" />
+                <div className="h-3 w-1/2 rounded bg-white/15" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
         <div className="p-10 text-center">
           <div className="mx-auto sticker inline-block bg-white p-6">

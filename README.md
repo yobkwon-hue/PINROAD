@@ -50,8 +50,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 
 ```
 app/
-  page.tsx                  # 메인 지도
-  my/page.tsx               # 내 박제 (리스트/지도 토글)
+  page.tsx                  # 메인 지도 (필터 칩 · 최근 박제 패널 · 현위치 · FAB)
+  welcome/page.tsx          # 첫 진입 환영 화면 (localStorage 플래그 후 / 로 진입)
+  my/page.tsx               # 내 박제 (리스트/지도 토글, 필터 인지 빈 상태)
   locks/[token]/page.tsx    # 링크 공유
   layout.tsx                # Leaflet CSS 포함
   globals.css               # Y2K 디자인 시스템 + Leaflet 컨트롤 스타일
