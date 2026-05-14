@@ -175,6 +175,16 @@ body {
   border: none !important;
 }
 
+.lockmap-marker {
+  transition: transform 160ms ease-out;
+  will-change: transform;
+}
+
+.lockmap-marker:hover {
+  transform: scale(1.1) translateY(-2px);
+  z-index: 500 !important;
+}
+
 .lockmap-marker.is-selected {
   filter: drop-shadow(0 0 18px rgba(255, 46, 147, 0.85))
     drop-shadow(0 0 4px rgba(255, 46, 147, 0.6));
