@@ -15,11 +15,11 @@ const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
 type Filter = 'all' | LockVisibility;
 
-const FILTERS: { key: Filter; label: string }[] = [
-  { key: 'all', label: '전체' },
-  { key: 'public', label: '공개' },
-  { key: 'private', label: '비공개' },
-  { key: 'link', label: '링크' },
+const FILTERS: { key: Filter; label: string; empty: string }[] = [
+  { key: 'all', label: '전체', empty: '아직 박제 0개 — 1빠로 박제해 ㄱㄱ ✨' },
+  { key: 'public', label: '공개', empty: '공개 자물쇠 0개 — 첫 박제 ㄱㄱ' },
+  { key: 'private', label: '비공개', empty: '비공개 자물쇠 0개 — 익명이라 본인 거만 표시됨' },
+  { key: 'link', label: '링크', empty: '링크 자물쇠 0개 — 본인이 박제한 링크 자물쇠만 보임' },
 ];
 
 const SEEN_WELCOME_KEY = 'bakje_seen_welcome';
@@ -41,6 +41,26 @@ export default function HomePage() {
   const [loaded, setLoaded] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
   const [recentOpen, setRecentOpen] = useState(true);
+  const [locating, setLocating] = useState(false);
+
+  const locateMe = () => {
+    if (!navigator.geolocation) {
+      alert('이 브라우저는 위치 못 잡음 ㅠ');
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocating(false);
+      },
+      () => {
+        alert('위치 못 가져옴.. 권한 확인 ㄱㄱ');
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  };
 
   // First-visit redirect to /welcome
   useEffect(() => {
@@ -98,10 +118,12 @@ export default function HomePage() {
 
             <button
               type="button"
-              aria-label="알림"
-              className="sticker shrink-0 bg-bg px-3 py-2 text-lg hover:-translate-y-0.5 transition-transform"
+              aria-label="알림 (준비 중)"
+              onClick={() => alert('알림 기능 준비 중! 💌')}
+              className="sticker relative shrink-0 bg-bg px-3 py-2 text-lg hover:-translate-y-0.5 transition-transform"
             >
               🔔
+              <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-cyber-pink ring-2 ring-bg" />
             </button>
             <Link
               href="/my"
@@ -135,13 +157,22 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* EMPTY STATE */}
+      {/* LOADING / EMPTY */}
+      {!loaded && (
+        <div className="pointer-events-none absolute inset-x-0 top-32 z-10 flex justify-center px-4">
+          <div className="sticker pointer-events-auto bg-white/95 px-4 py-2 text-xs font-extrabold tracking-widest text-cyber-pink animate-pulse">
+            박제 불러오는 중...
+          </div>
+        </div>
+      )}
       {loaded && locks.length === 0 && (
         <div className="pointer-events-none absolute inset-x-0 top-32 z-10 flex justify-center px-4">
           <div className="sticker pointer-events-auto bg-white px-5 py-4 text-center animate-pop-in">
-            <div className="font-display text-xl text-black">아직 박제 0개</div>
+            <div className="font-display text-xl text-black">
+              {FILTERS.find((f) => f.key === filter)?.empty.split(' — ')[0] ?? '결과 없음'}
+            </div>
             <div className="mt-1 text-xs font-bold text-black/65">
-              1빠로 박제해 ㄱㄱ ✨
+              {FILTERS.find((f) => f.key === filter)?.empty.split(' — ')[1] ?? ''}
             </div>
           </div>
         </div>
@@ -157,8 +188,16 @@ export default function HomePage() {
         <span className="font-display tracking-wide">여기 박제</span>
       </button>
 
-      {/* Bottom counter */}
-      <div className="pointer-events-none absolute bottom-5 left-5 z-20">
+      {/* Bottom-left cluster: counter + locate-me */}
+      <div className="absolute bottom-5 left-5 z-20 flex flex-col gap-2">
+        <button
+          onClick={locateMe}
+          disabled={locating}
+          aria-label="내 위치로 이동"
+          className="sticker-btn !px-3 !py-2 bg-cyber-blue text-xs text-black"
+        >
+          {locating ? '...' : '📡 현위치'}
+        </button>
         <div className="sticker bg-bg/90 px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-cyber-blue">
           📍 박제 {locks.length}개
         </div>
