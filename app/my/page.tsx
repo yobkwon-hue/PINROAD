@@ -53,6 +53,13 @@ export default function MyPage() {
     { key: 'link', label: VISIBILITY_META.link.label },
   ];
 
+  const emptyCopy: Record<Filter, { title: string; sub: string }> = {
+    all: { title: '아직 박제 없음', sub: '첫 박제 ㄱㄱ ✨' },
+    public: { title: '공개 박제 없음', sub: '지도에 1빠로 박제해보자' },
+    private: { title: '비공개 박제 없음', sub: '나만 볼 시크릿 일기장 ㄱㄱ' },
+    link: { title: '링크 박제 없음', sub: '둘만의 자물쇠 만들어볼래?' },
+  };
+
   return (
     <div className="min-h-dvh">
       <header className="sticky top-0 z-20 border-b-2 border-black/40 bg-bg/90 backdrop-blur-md">
@@ -102,8 +109,8 @@ export default function MyPage() {
       ) : filtered.length === 0 ? (
         <div className="p-10 text-center">
           <div className="mx-auto sticker inline-block bg-white p-6">
-            <div className="font-display text-2xl text-black">아직 박제 없음</div>
-            <div className="mt-1 text-sm font-bold text-black/60">첫 박제 ㄱㄱ ✨</div>
+            <div className="font-display text-2xl text-black">{emptyCopy[filter].title}</div>
+            <div className="mt-1 text-sm font-bold text-black/60">{emptyCopy[filter].sub}</div>
             <Link
               href="/"
               className="sticker-btn mt-4 inline-flex bg-cyber-pink text-white"

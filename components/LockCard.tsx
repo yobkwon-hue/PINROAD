@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Lock, VISIBILITY_META } from '@/lib/types';
 import { buildLockSvg } from '@/lib/lockSvg';
 
