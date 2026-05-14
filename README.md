@@ -4,7 +4,9 @@
 
 ## 주요 기능
 
-- 🗺️ **다크 지도 + 컬러 자물쇠 핀** — Leaflet + CARTO Dark Matter
+- 🖥️ **데스크탑 대시보드** — `lg:` 부터 좌측 사이드바(웰컴/카운트/최근 박제/기능) + 우측 도킹 패널(자물쇠 상세·박제 플로우)
+- 🛰️ **실시간 스트림** — Supabase realtime 구독으로 새 박제·삭제가 즉시 반영
+- 🗺️ **다크 지도 + 컬러 자물쇠 핀** — Leaflet + CARTO Dark Matter, 핀 hover lift
 - 🔍 **장소 검색** — Nominatim 지오코딩, `/` 키로 빠른 포커스, ✕로 클리어
 - 🔒 **3종 자물쇠** — 공개 / 비공개(나만) / 링크(둘만의)
 - 📡 **현위치 점프** — 좌하단 버튼, 검색 결과로도 즉시 이동
@@ -80,12 +82,13 @@ app/
   layout.tsx                # Leaflet CSS + ToastHost + 메타데이터 (favicon, OG, manifest)
   globals.css               # Y2K 디자인 시스템 + Leaflet 컨트롤·툴팁 스타일 + a11y 미디어 쿼리
 components/
-  MapView.tsx               # Leaflet 래퍼 (다크 타일, 선택 핀 강조, 호버 툴팁)
-  CreateLockFlow.tsx        # 4-step 박제 플로우 (localStorage draft 자동 저장)
-  LockModal.tsx             # 자물쇠 상세 (인용구, 1분 삭제 카운트다운, 공유 링크, Esc)
+  MapView.tsx               # Leaflet 래퍼 (다크 타일, 선택 핀 강조, 호버 툴팁, hover lift)
+  CreateLockFlow.tsx        # 4-step 박제 플로우 (localStorage draft, lg:우측 도킹)
+  LockModal.tsx             # 자물쇠 상세 (인용구, 1분 삭제 카운트다운, 공유 링크, lg:우측 도킹)
   LockCard.tsx              # /my 리스트 카드 (timeAgo)
   SearchBar.tsx             # Nominatim 지오코딩 (/ 단축키, ✕ 클리어)
   Toast.tsx                 # 토스트 시스템 (모듈 pub/sub + ToastHost)
+  HomeSideBar.tsx           # 데스크탑 좌측 사이드바 (웰컴/카운트/최근/기능)
 lib/
   types.ts
   lockSvg.ts                # 플랫 스티커 자물쇠 SVG
