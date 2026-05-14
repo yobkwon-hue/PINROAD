@@ -7,8 +7,10 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Lock, LockVisibility } from '@/lib/types';
 import { buildLockSvg } from '@/lib/lockSvg';
+import { timeAgo } from '@/lib/timeAgo';
 import SearchBar from '@/components/SearchBar';
 import LockModal from '@/components/LockModal';
+import { toast } from '@/components/Toast';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 // CreateLockFlow is bigger and only needed when the user starts a new lock;
@@ -28,14 +30,6 @@ const FILTERS: { key: Filter; label: string; empty: string }[] = [
 
 const SEEN_WELCOME_KEY = 'bakje_seen_welcome';
 
-function timeAgo(iso: string): string {
-  const diffSec = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (diffSec < 60) return '방금 전';
-  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}분 전`;
-  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}시간 전`;
-  return `${Math.floor(diffSec / 86400)}일 전`;
-}
-
 export default function HomePage() {
   const router = useRouter();
   const [locks, setLocks] = useState<Lock[]>([]);
@@ -52,7 +46,7 @@ export default function HomePage() {
 
   const locateMe = () => {
     if (!navigator.geolocation) {
-      alert('이 브라우저는 위치 못 잡음 ㅠ');
+      toast('이 브라우저는 위치 못 잡음 ㅠ', 'error');
       return;
     }
     setLocating(true);
@@ -60,9 +54,10 @@ export default function HomePage() {
       (pos) => {
         setCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setLocating(false);
+        toast('현위치로 이동 📡', 'success');
       },
       () => {
-        alert('위치 못 가져옴.. 권한 확인 ㄱㄱ');
+        toast('위치 못 가져옴 — 권한 확인 ㄱㄱ', 'error');
         setLocating(false);
       },
       { enableHighAccuracy: true, timeout: 8000 },
@@ -130,7 +125,7 @@ export default function HomePage() {
             <button
               type="button"
               aria-label="알림 (준비 중)"
-              onClick={() => alert('알림 기능 준비 중! 💌')}
+              onClick={() => toast('알림 기능 준비 중! 💌', 'info')}
               className="sticker relative shrink-0 bg-bg px-3 py-2 text-lg hover:-translate-y-0.5 transition-transform"
             >
               🔔

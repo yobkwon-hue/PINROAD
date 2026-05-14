@@ -5,6 +5,7 @@ import { Lock, VISIBILITY_META } from '@/lib/types';
 import { buildLockSvg } from '@/lib/lockSvg';
 import { supabase } from '@/lib/supabase';
 import { getAnonymousUserId } from '@/lib/anonymous-user';
+import { toast } from '@/components/Toast';
 
 interface LockModalProps {
   lock: Lock | null;
@@ -123,9 +124,10 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
       .eq('user_id', getAnonymousUserId());
     setDeleting(false);
     if (error) {
-      alert('삭제 실패 ㅠ');
+      toast('삭제 실패 ㅠ', 'error');
       return;
     }
+    toast('박제 지움 🗑️', 'info');
     onDeleted?.();
     onClose();
   };

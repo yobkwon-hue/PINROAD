@@ -1,0 +1,20 @@
+{
+  "name": "박제맵",
+  "short_name": "박제맵",
+  "description": "지도 위에 자물쇠 박제하고 마음 잠그는 곳",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b14",
+  "theme_color": "#0b0b14",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    }
+  ]
+}

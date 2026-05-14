@@ -14,6 +14,7 @@ import {
   VISIBILITY_META,
 } from '@/lib/types';
 import { buildLockSvg } from '@/lib/lockSvg';
+import { toast } from '@/components/Toast';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
@@ -46,7 +47,7 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
 
   function useCurrentLocation() {
     if (!navigator.geolocation) {
-      alert('이 브라우저는 위치 못 잡음 ㅠ');
+      toast('이 브라우저는 위치 못 잡음 ㅠ', 'error');
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -56,7 +57,7 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
         setPosition({ lat, lng });
         reverseGeocode(lat, lng);
       },
-      () => alert('위치 못 가져옴.. 권한 확인 ㄱㄱ'),
+      () => toast('위치 못 가져옴 — 권한 확인 ㄱㄱ', 'error'),
     );
   }
 
@@ -122,9 +123,10 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
     setSaving(false);
     if (error) {
       console.error(error);
-      alert('박제 실패 ㅠ 다시 ㄱㄱ');
+      toast('박제 실패 ㅠ 다시 ㄱㄱ', 'error');
       return;
     }
+    toast('박제 완료 🔒✨', 'success');
     if (visibility === 'link' && data?.share_token) {
       setSavedToken(data.share_token);
     } else if (data) {

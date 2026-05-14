@@ -192,6 +192,32 @@ body {
   }
 }
 
+/* Accessibility: honor the user's OS-level reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .lockmap-marker.is-selected {
+    animation: none;
+  }
+}
+
+/* Visible focus rings on keyboard nav (interactive elements only).
+   Tap highlight is already suppressed globally for touch devices. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #00d9ff;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 .leaflet-container {
   background: #0b0b14 !important;
   font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif !important;
