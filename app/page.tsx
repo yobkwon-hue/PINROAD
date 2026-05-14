@@ -142,6 +142,18 @@ export default function HomePage() {
           toast('새 박제가 올라왔어요 ✨', 'info');
         },
       )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'locks' },
+        (payload) => {
+          // DELETE payload only carries the primary key
+          const id = (payload.old as { id?: string }).id;
+          if (!id) return;
+          setLocks((prev) => prev.filter((l) => l.id !== id));
+          // If the currently-open modal pointed at the removed lock, close it
+          setSelected((cur) => (cur?.id === id ? null : cur));
+        },
+      )
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
