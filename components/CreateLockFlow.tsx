@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
 import { getAnonymousUserId } from '@/lib/anonymous-user';
@@ -131,6 +131,15 @@ export default function CreateLockFlow({ onClose, onCreated }: Props) {
     if (step === 1) return onClose();
     setStep((s) => s - 1);
   };
+
+  // Esc closes the whole flow (mirrors LockModal). Step-back stays on the back button.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   return (
     <div className="fixed inset-0 z-40 flex animate-fade-in flex-col bg-bg/95 backdrop-blur-md">

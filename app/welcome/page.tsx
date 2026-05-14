@@ -48,7 +48,10 @@ export default function WelcomePage() {
     <div className="min-h-dvh w-full overflow-x-hidden">
       <main className="mx-auto flex max-w-xl flex-col gap-6 px-5 py-10">
         {/* HERO */}
-        <section className="sticker-lg relative overflow-hidden bg-bg-soft p-7 text-center">
+        <section
+          className="sticker-lg relative overflow-hidden bg-bg-soft p-7 text-center animate-slide-up"
+          style={{ animationDelay: '60ms' }}
+        >
           <div className="font-display text-5xl leading-none text-holo">BAKJE</div>
           <div className="font-display text-5xl leading-none text-holo">MAP</div>
           <p className="mt-3 text-sm font-semibold text-white/75">
@@ -93,7 +96,10 @@ export default function WelcomePage() {
         </section>
 
         {/* ABOUT */}
-        <section className="sticker bg-bg-soft p-5">
+        <section
+          className="sticker bg-bg-soft p-5 animate-slide-up"
+          style={{ animationDelay: '220ms', animationFillMode: 'backwards' }}
+        >
           <div className="text-[11px] font-extrabold tracking-widest text-cyber-pink">
             BAKJE MAP?
           </div>

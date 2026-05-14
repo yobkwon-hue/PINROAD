@@ -9,9 +9,13 @@ import { Lock, LockVisibility } from '@/lib/types';
 import { buildLockSvg } from '@/lib/lockSvg';
 import SearchBar from '@/components/SearchBar';
 import LockModal from '@/components/LockModal';
-import CreateLockFlow from '@/components/CreateLockFlow';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
+// CreateLockFlow is bigger and only needed when the user starts a new lock;
+// dynamic import keeps it out of the initial home bundle.
+const CreateLockFlow = dynamic(() => import('@/components/CreateLockFlow'), {
+  ssr: false,
+});
 
 type Filter = 'all' | LockVisibility;
 
