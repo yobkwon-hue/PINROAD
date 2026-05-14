@@ -97,16 +97,23 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
     remainingSec % 60,
   ).padStart(2, '0')}`;
 
-  const shareUrl =
-    lock.visibility === 'link' && lock.share_token && typeof window !== 'undefined'
-      ? `${window.location.origin}/locks/${lock.share_token}`
-      : null;
+  const shareUrl = (() => {
+    if (typeof window === 'undefined') return null;
+    if (lock.visibility === 'link' && lock.share_token) {
+      return `${window.location.origin}/locks/${lock.share_token}`;
+    }
+    if (lock.visibility === 'public') {
+      return `${window.location.origin}/#lock-${lock.id}`;
+    }
+    return null;
+  })();
 
   const handleShare = async () => {
     if (!shareUrl) return;
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
+      toast('링크 복사됨 🔗', 'success');
       setTimeout(() => setCopied(false), 1500);
     } catch {
       window.prompt('이 링크 복사해서 보내', shareUrl);
