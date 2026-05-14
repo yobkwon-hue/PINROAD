@@ -13,6 +13,7 @@ const MapView = dynamic(() => import('@/components/MapView'), { ssr: false });
 
 type Filter = 'all' | LockVisibility;
 type ViewMode = 'list' | 'map';
+type SortMode = 'newest' | 'oldest';
 
 export default function MyPage() {
   const [locks, setLocks] = useState<Lock[]>([]);
@@ -20,6 +21,7 @@ export default function MyPage() {
   const [view, setView] = useState<ViewMode>('list');
   const [selected, setSelected] = useState<Lock | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sort, setSort] = useState<SortMode>('newest');
 
   const fetchLocks = () => {
     const uid = getAnonymousUserId();
@@ -35,10 +37,15 @@ export default function MyPage() {
     fetchLocks();
   }, []);
 
-  const filtered = useMemo(
-    () => (filter === 'all' ? locks : locks.filter((l) => l.visibility === filter)),
-    [filter, locks],
-  );
+  const filtered = useMemo(() => {
+    const base = filter === 'all' ? locks : locks.filter((l) => l.visibility === filter);
+    const sorted = [...base].sort((a, b) => {
+      const at = new Date(a.created_at).getTime();
+      const bt = new Date(b.created_at).getTime();
+      return sort === 'newest' ? bt - at : at - bt;
+    });
+    return sorted;
+  }, [filter, locks, sort]);
 
   const counts = useMemo(() => {
     const c = { all: locks.length, public: 0, private: 0, link: 0 } as Record<Filter, number>;
@@ -85,7 +92,15 @@ export default function MyPage() {
           ))}
           <div className="ml-auto flex shrink-0 gap-1">
             <button
+              onClick={() => setSort(sort === 'newest' ? 'oldest' : 'newest')}
+              aria-label={`정렬: 현재 ${sort === 'newest' ? '최신순' : '오래된순'} — 클릭하여 토글`}
+              className="sticker-btn !px-3 !py-1.5 bg-white text-xs text-black"
+            >
+              {sort === 'newest' ? '↓ 최신' : '↑ 오래된'}
+            </button>
+            <button
               onClick={() => setView('list')}
+              aria-label="리스트 보기"
               className={`sticker-btn !px-3 !py-1.5 text-xs ${
                 view === 'list' ? 'bg-cyber-blue text-black' : 'bg-white text-black'
               }`}
@@ -94,6 +109,7 @@ export default function MyPage() {
             </button>
             <button
               onClick={() => setView('map')}
+              aria-label="지도 보기"
               className={`sticker-btn !px-3 !py-1.5 text-xs ${
                 view === 'map' ? 'bg-cyber-blue text-black' : 'bg-white text-black'
               }`}

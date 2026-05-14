@@ -269,6 +269,14 @@ export default function HomePage() {
                 <kbd className="chip bg-neon-yellow">?</kbd>
               </li>
             </ul>
+            <div className="mt-4 border-t-2 border-dashed border-black/30 pt-3 text-center">
+              <Link
+                href="/welcome"
+                className="text-xs font-extrabold tracking-widest text-cyber-blue hover:text-cyber-pink"
+              >
+                ✨ 환영 화면 다시 보기
+              </Link>
+            </div>
           </div>
         </div>
       )}
