@@ -163,7 +163,13 @@ export default function HomePage() {
             </Link>
 
             <div className="min-w-0 flex-1">
-              <SearchBar onResult={(lat, lng) => setCenter({ lat, lng })} />
+              <SearchBar
+                onResult={(lat, lng, name) => {
+                  setCenter({ lat, lng });
+                  const short = name.split(',')[0]?.trim() || '검색 결과';
+                  toast(`📍 ${short}(으)로 이동`, 'success');
+                }}
+              />
             </div>
 
             <button

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Lock, VISIBILITY_META } from '@/lib/types';
 import { buildLockSvg } from '@/lib/lockSvg';
+import { timeAgo } from '@/lib/timeAgo';
 
 interface LockCardProps {
   lock: Lock;
@@ -13,11 +14,8 @@ export default function LockCard({ lock, onClick }: LockCardProps) {
   const [copied, setCopied] = useState(false);
   const svg = buildLockSvg(lock.color, lock.shape, 56);
   const meta = VISIBILITY_META[lock.visibility];
-  const date = new Date(lock.created_at).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  // timeAgo falls back to a localized date past the 7-day cutoff.
+  const date = timeAgo(lock.created_at);
 
   const copyLink = async (e: React.MouseEvent) => {
     e.stopPropagation();
