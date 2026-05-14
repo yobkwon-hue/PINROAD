@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Lock, VISIBILITY_META } from '@/lib/types';
 import { buildLockSvg } from '@/lib/lockSvg';
+import { toast } from '@/components/Toast';
 
 export default function LinkLockPage() {
   const params = useParams<{ token: string }>();
@@ -96,11 +97,22 @@ export default function LinkLockPage() {
           </div>
         </div>
 
-        <div className="mt-4 text-center">
-          <Link
-            href="/"
-            className="sticker-btn inline-flex bg-white text-sm text-black"
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(window.location.href);
+                toast('링크 복사됨 🔗', 'success');
+              } catch {
+                window.prompt('이 링크 복사해서 보내', window.location.href);
+              }
+            }}
+            className="sticker-btn bg-neon-yellow text-sm text-black"
           >
+            🔗 링크 복사
+          </button>
+          <Link href="/" className="sticker-btn inline-flex bg-white text-sm text-black">
             나도 박제하러 ㄱㄱ →
           </Link>
         </div>
