@@ -313,7 +313,10 @@ export default function HomePage() {
         >
           {locating ? '...' : '📡 현위치'}
         </button>
-        <div className="sticker bg-bg/90 px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-cyber-blue">
+        <div
+          key={locks.length}
+          className="sticker bg-bg/90 px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-cyber-blue animate-pop-in"
+        >
           📍 박제 {locks.length}개
         </div>
       </div>

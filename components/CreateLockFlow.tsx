@@ -426,11 +426,26 @@ function Step3Design({
   setShape: (v: LockShape) => void;
 }) {
   const svg = buildLockSvg(color, shape, 140);
+  const randomize = () => {
+    setColor(COLORS[Math.floor(Math.random() * COLORS.length)]);
+    setShape(SHAPES[Math.floor(Math.random() * SHAPES.length)]);
+  };
   return (
     <div className="mx-auto max-w-md p-5">
-      <h2 className="font-display text-3xl text-white">
-        스타일 <span className="text-holo">PICK 🎨</span>
-      </h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-display text-3xl text-white">
+          스타일 <span className="text-holo">PICK 🎨</span>
+        </h2>
+        <button
+          type="button"
+          onClick={randomize}
+          className="sticker !px-2.5 !py-1 bg-bg-soft text-[10px] font-extrabold tracking-widest text-white/80 hover:text-white"
+          aria-label="컬러와 모양 무작위로"
+          title="랜덤"
+        >
+          🎲 랜덤
+        </button>
+      </div>
       <p className="mt-1 text-sm text-white/60">취향대로 찍어</p>
 
       <div className="relative mt-5 flex justify-center py-6">
