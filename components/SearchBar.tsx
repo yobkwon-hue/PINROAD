@@ -56,12 +56,26 @@ export default function SearchBar({ onResult }: SearchBarProps) {
             setErr(null);
           }}
           placeholder="어디 박제할까? 🔍 (예: 홍대, 남산)"
-          className="flex-1 bg-transparent px-4 py-3 text-sm font-semibold text-black placeholder:text-black/40 outline-none"
+          className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm font-semibold text-black placeholder:text-black/40 outline-none"
+          aria-label="장소 검색"
         />
+        {query && (
+          <button
+            type="button"
+            onClick={() => {
+              setQuery('');
+              setErr(null);
+            }}
+            className="shrink-0 px-2 text-base font-extrabold text-black/40 hover:text-black"
+            aria-label="검색어 지우기"
+          >
+            ✕
+          </button>
+        )}
         <button
           type="submit"
           disabled={searching || !query.trim()}
-          className="bg-cyber-pink px-4 py-3 text-sm font-extrabold text-white disabled:opacity-50"
+          className="shrink-0 bg-cyber-pink px-4 py-3 text-sm font-extrabold text-white disabled:opacity-50"
           style={{ borderLeft: '3px solid #000' }}
         >
           {searching ? '...' : 'GO'}

@@ -48,6 +48,16 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
     return () => window.clearInterval(id);
   }, [lock]);
 
+  // Close on Esc — backdrop click already handles mouse dismiss.
+  useEffect(() => {
+    if (!lock) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lock, onClose]);
+
   if (!lock) return null;
 
   const meta = VISIBILITY_META[lock.visibility];
