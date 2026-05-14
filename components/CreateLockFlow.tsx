@@ -235,7 +235,7 @@ function Step1Location({
         locks={[]}
         onMapClick={onPick}
         selectedPosition={position}
-        className="absolute inset-0"
+        className="absolute inset-0 z-0"
       />
       <div className="pointer-events-none absolute inset-x-0 top-3 z-[500] flex justify-center">
         <div className="sticker pointer-events-auto bg-white px-4 py-2 text-sm font-extrabold text-black">
