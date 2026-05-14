@@ -175,6 +175,23 @@ body {
   border: none !important;
 }
 
+.lockmap-marker.is-selected {
+  filter: drop-shadow(0 0 18px rgba(255, 46, 147, 0.85))
+    drop-shadow(0 0 4px rgba(255, 46, 147, 0.6));
+  z-index: 999 !important;
+  animation: marker-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes marker-pulse {
+  0%,
+  100% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.18) translateZ(0);
+  }
+}
+
 .leaflet-container {
   background: #0b0b14 !important;
   font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif !important;

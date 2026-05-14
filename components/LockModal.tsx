@@ -20,6 +20,7 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
   const [busy, setBusy] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!lock) return;
@@ -84,6 +85,22 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
   const countdownLabel = `${String(Math.floor(remainingSec / 60)).padStart(2, '0')}:${String(
     remainingSec % 60,
   ).padStart(2, '0')}`;
+
+  const shareUrl =
+    lock.visibility === 'link' && lock.share_token && typeof window !== 'undefined'
+      ? `${window.location.origin}/locks/${lock.share_token}`
+      : null;
+
+  const handleShare = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      window.prompt('이 링크 복사해서 보내', shareUrl);
+    }
+  };
 
   const handleDelete = async () => {
     if (!canDelete || deleting) return;
@@ -180,7 +197,7 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
         )}
 
         {/* actions */}
-        <div className="mt-4 flex justify-center gap-2">
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
           {canDelete && (
             <button
               onClick={handleDelete}
@@ -188,6 +205,14 @@ export default function LockModal({ lock, onClose, onDeleted }: LockModalProps) 
               className="sticker-btn bg-white text-sm text-black"
             >
               {deleting ? '지우는 중...' : '삭제하기'}
+            </button>
+          )}
+          {shareUrl && (
+            <button
+              onClick={handleShare}
+              className="sticker-btn bg-neon-yellow text-sm text-black"
+            >
+              {copied ? '복사됨 ✓' : '🔗 링크 복사'}
             </button>
           )}
           <button

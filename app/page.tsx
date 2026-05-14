@@ -40,7 +40,10 @@ export default function HomePage() {
   const [center, setCenter] = useState({ lat: 37.5512, lng: 126.9882 });
   const [loaded, setLoaded] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
-  const [recentOpen, setRecentOpen] = useState(true);
+  const [recentOpen, setRecentOpen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true;
+    return window.matchMedia('(min-width: 640px)').matches;
+  });
   const [locating, setLocating] = useState(false);
 
   const locateMe = () => {
@@ -95,6 +98,7 @@ export default function HomePage() {
         locks={locks}
         onPinClick={setSelected}
         initialCenter={center}
+        selectedLockId={selected?.id ?? null}
         className="absolute inset-0 z-0"
       />
 
@@ -104,10 +108,11 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="sticker inline-flex shrink-0 items-center gap-2 bg-bg px-3 py-2 hover:-translate-y-0.5 transition-transform"
+              className="sticker inline-flex shrink-0 items-center gap-2 bg-bg px-2 py-2 sm:px-3 hover:-translate-y-0.5 transition-transform"
+              aria-label="박제맵 홈"
             >
-              <span className="font-display text-2xl leading-none text-holo">박제맵</span>
-              <span className="text-[10px] font-extrabold leading-none tracking-widest text-cyber-pink">
+              <span className="font-display text-xl leading-none text-holo sm:text-2xl">박제맵</span>
+              <span className="hidden text-[10px] font-extrabold leading-none tracking-widest text-cyber-pink sm:inline">
                 v1
               </span>
             </Link>

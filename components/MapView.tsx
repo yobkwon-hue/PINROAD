@@ -14,6 +14,7 @@ interface MapViewProps {
   onPinClick?: (lock: Lock) => void;
   onMapClick?: (lat: number, lng: number) => void;
   selectedPosition?: { lat: number; lng: number } | null;
+  selectedLockId?: string | null;
   initialCenter?: { lat: number; lng: number };
   initialLevel?: number; // Leaflet zoom: ~13 ≈ city level
   className?: string;
@@ -29,6 +30,7 @@ export default function MapView({
   onPinClick,
   onMapClick,
   selectedPosition,
+  selectedLockId,
   initialCenter = { lat: 37.5512, lng: 126.9882 }, // Namsan default
   initialLevel = 13,
   className = '',
@@ -38,6 +40,7 @@ export default function MapView({
   const markersRef = useRef<Marker[]>([]);
   const pickerRef = useRef<Marker | null>(null);
   const LRef = useRef<LeafletNS | null>(null);
+  const highlightedElRef = useRef<HTMLElement | null>(null);
 
   // Init map
   useEffect(() => {
@@ -125,6 +128,24 @@ export default function MapView({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locks]);
+
+  // Toggle the 'selected' class on the marker DOM when the parent's selection changes.
+  // Doing this via DOM mutation avoids recreating all markers on each click.
+  useEffect(() => {
+    if (highlightedElRef.current) {
+      highlightedElRef.current.classList.remove('is-selected');
+      highlightedElRef.current = null;
+    }
+    if (!selectedLockId) return;
+    const idx = locks.findIndex((l) => l.id === selectedLockId);
+    if (idx < 0) return;
+    const marker = markersRef.current[idx];
+    const el = marker?.getElement() as HTMLElement | null;
+    if (el) {
+      el.classList.add('is-selected');
+      highlightedElRef.current = el;
+    }
+  }, [selectedLockId, locks]);
 
   // Picker marker
   useEffect(() => {

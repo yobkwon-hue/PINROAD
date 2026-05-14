@@ -144,6 +144,7 @@ export default function MyPage() {
           <MapView
             locks={filtered}
             onPinClick={setSelected}
+            selectedLockId={selected?.id ?? null}
             className="absolute inset-0 z-0"
           />
         </div>
