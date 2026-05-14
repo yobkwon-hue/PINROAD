@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Lock, LockVisibility } from '@/lib/types';
+import { buildLockSvg } from '@/lib/lockSvg';
 import SearchBar from '@/components/SearchBar';
 import LockModal from '@/components/LockModal';
 import CreateLockFlow from '@/components/CreateLockFlow';
@@ -20,13 +22,36 @@ const FILTERS: { key: Filter; label: string }[] = [
   { key: 'link', label: '링크' },
 ];
 
+const SEEN_WELCOME_KEY = 'bakje_seen_welcome';
+
+function timeAgo(iso: string): string {
+  const diffSec = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diffSec < 60) return '방금 전';
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}분 전`;
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}시간 전`;
+  return `${Math.floor(diffSec / 86400)}일 전`;
+}
+
 export default function HomePage() {
+  const router = useRouter();
   const [locks, setLocks] = useState<Lock[]>([]);
   const [selected, setSelected] = useState<Lock | null>(null);
   const [creating, setCreating] = useState(false);
   const [center, setCenter] = useState({ lat: 37.5512, lng: 126.9882 });
   const [loaded, setLoaded] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
+  const [recentOpen, setRecentOpen] = useState(true);
+
+  // First-visit redirect to /welcome
+  useEffect(() => {
+    try {
+      if (!window.localStorage.getItem(SEEN_WELCOME_KEY)) {
+        router.replace('/welcome');
+      }
+    } catch {
+      /* private mode etc. — just stay on home */
+    }
+  }, [router]);
 
   const fetchLocks = useCallback(async () => {
     let q = supabase
@@ -138,6 +163,69 @@ export default function HomePage() {
           📍 박제 {locks.length}개
         </div>
       </div>
+
+      {/* RECENT PANEL */}
+      {locks.length > 0 && (
+        <div className="pointer-events-none absolute bottom-24 right-3 z-20 w-[260px] max-w-[calc(100vw-1.5rem)]">
+          {recentOpen ? (
+            <div className="sticker pointer-events-auto bg-bg/95 p-3 animate-slide-up">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-[11px] font-extrabold tracking-widest text-cyber-pink">
+                  📍 최근 박제
+                </div>
+                <button
+                  onClick={() => setRecentOpen(false)}
+                  className="text-sm text-white/55 hover:text-white"
+                  aria-label="패널 닫기"
+                >
+                  ✕
+                </button>
+              </div>
+              <ul className="mt-2 space-y-1.5">
+                {locks.slice(0, 3).map((l) => (
+                  <li key={l.id}>
+                    <button
+                      onClick={() => {
+                        setSelected(l);
+                        setCenter({ lat: l.lat, lng: l.lng });
+                      }}
+                      className="flex w-full items-center gap-2 rounded-lg border-2 border-black/30 bg-bg-soft px-2 py-1.5 text-left hover:border-cyber-pink/70"
+                    >
+                      <span
+                        className="shrink-0"
+                        dangerouslySetInnerHTML={{
+                          __html: buildLockSvg(l.color, l.shape, 22),
+                        }}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-xs font-extrabold text-white">
+                          {l.location_name || `${l.lat.toFixed(3)}, ${l.lng.toFixed(3)}`}
+                        </span>
+                        <span className="block text-[10px] font-bold text-white/50">
+                          {timeAgo(l.created_at)}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/my"
+                className="mt-2 block text-center text-[11px] font-extrabold tracking-widest text-cyber-blue hover:text-cyber-pink"
+              >
+                더 보기 →
+              </Link>
+            </div>
+          ) : (
+            <button
+              onClick={() => setRecentOpen(true)}
+              className="sticker-btn pointer-events-auto bg-bg/95 !px-3 !py-2 text-xs text-cyber-pink"
+            >
+              📍 최근 박제
+            </button>
+          )}
+        </div>
+      )}
 
       <LockModal
         lock={selected}
