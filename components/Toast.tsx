@@ -20,9 +20,13 @@ function emit() {
   for (const l of listeners) l(toasts);
 }
 
+const MAX_VISIBLE = 4;
+
 export function toast(message: string, kind: ToastKind = 'info', ttlMs = 2500) {
   const id = nextId++;
-  toasts = [...toasts, { id, message, kind }];
+  // Keep only the most recent N so a stuck loop or rapid-fire calls can't
+  // flood the screen.
+  toasts = [...toasts, { id, message, kind }].slice(-MAX_VISIBLE);
   emit();
   window.setTimeout(() => {
     toasts = toasts.filter((t) => t.id !== id);
