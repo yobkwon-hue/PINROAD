@@ -149,7 +149,15 @@ export default function HomePage() {
       />
 
       {/* Desktop-only sidebar */}
-      <HomeSideBar count={locks.length} onCreate={() => setCreating(true)} />
+      <HomeSideBar
+        count={locks.length}
+        locks={locks}
+        onCreate={() => setCreating(true)}
+        onSelect={(l) => {
+          setSelected(l);
+          setCenter({ lat: l.lat, lng: l.lng });
+        }}
+      />
 
       {/* TOP BAR */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 p-3">
@@ -327,9 +335,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* RECENT PANEL */}
+      {/* RECENT PANEL — hidden on lg+ since the sidebar renders the same data */}
       {locks.length > 0 && (
-        <div className="pointer-events-none absolute bottom-24 right-3 z-20 w-[260px] max-w-[calc(100vw-1.5rem)]">
+        <div className="pointer-events-none absolute bottom-24 right-3 z-20 w-[260px] max-w-[calc(100vw-1.5rem)] lg:hidden">
           {recentOpen ? (
             <div className="sticker pointer-events-auto bg-bg/95 p-3 animate-slide-up">
               <div className="flex items-center justify-between gap-2">
